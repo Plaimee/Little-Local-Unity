@@ -1,0 +1,231 @@
+fileFormatVersion: 2
+guid: ec231b7b99a9213408f8f1fb35886f2d
+TextureImporter:
+  internalIDToNameTable: []
+  externalObjects: {}
+  serializedVersion: 12
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 12, y: 0, z: 1162, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 3
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Server
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: SULogo_0
+      rect:
+        serializedVersion: 2
+        x: 33
+        y: 55
+        width: 445
+        height: 435
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7566e54dcf1cf374897f0505560abed9
+      internalID: -1566149006
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 1537655665
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    nameFileIdTable:
+      SULogo_0: -1566149006
+      SULogo_1: 87423984
+      SULogo_10: 852189271
+      SULogo_11: -722598760
+      SULogo_12: 153047516
+      SULogo_13: 1904393662
+      SULogo_14: 2006958769
+      SULogo_15: -115911633
+      SULogo_16: 1548862380
+      SULogo_17: 1773173258
+      SULogo_18: -1911417931
+      SULogo_19: -875186195
+      SULogo_2: 181050327
+      SULogo_20: 1633737483
+      SULogo_21: -967757370
+      SULogo_22: -779663443
+      SULogo_23: -464768243
+      SULogo_24: -1381657079
+      SULogo_25: -1500891525
+      SULogo_26: -1945464245
+      SULogo_27: -706749355
+      SULogo_28: 383688094
+      SULogo_29: 223444551
+      SULogo_3: -780757290
+      SULogo_30: -1528415774
+      SULogo_31: 796539844
+      SULogo_32: 1504596066
+      SULogo_33: -917398742
+      SULogo_34: -911881608
+      SULogo_35: 1982532199
+      SULogo_36: -1105874936
+      SULogo_37: 748363242
+      SULogo_38: -781122268
+      SULogo_39: -158095995
+      SULogo_4: -2102366640
+      SULogo_40: -1136546628
+      SULogo_41: -1555343438
+      SULogo_42: -1037461653
+      SULogo_43: -497079476
+      SULogo_44: -1196212646
+      SULogo_45: -822587294
+      SULogo_46: -107963581
+      SULogo_47: -801413861
+      SULogo_48: -2107779922
+      SULogo_49: -375024266
+      SULogo_5: -952590638
+      SULogo_50: -2018681717
+      SULogo_51: -805961998
+      SULogo_52: -987915190
+      SULogo_53: 772409966
+      SULogo_54: -965286407
+      SULogo_55: 1711115227
+      SULogo_56: 1906915267
+      SULogo_57: 274097028
+      SULogo_58: 242090285
+      SULogo_59: -1647337499
+      SULogo_6: 1970728385
+      SULogo_60: 334426292
+      SULogo_61: -327433415
+      SULogo_62: 2123844589
+      SULogo_63: -281195105
+      SULogo_64: -129307282
+      SULogo_65: -594289219
+      SULogo_66: 1469590694
+      SULogo_67: 144126468
+      SULogo_68: -223351824
+      SULogo_69: 414798864
+      SULogo_7: 262800191
+      SULogo_8: 98419140
+      SULogo_9: -1874442194
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
