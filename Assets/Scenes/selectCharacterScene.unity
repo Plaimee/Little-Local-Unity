@@ -2393,7 +2393,7 @@ GameObject:
   - component: {fileID: 1259318334}
   - component: {fileID: 1259318333}
   m_Layer: 0
-  m_Name: TT
+  m_Name: GG
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2684,7 +2684,7 @@ GameObject:
   - component: {fileID: 1465348119}
   - component: {fileID: 1465348118}
   m_Layer: 0
-  m_Name: PT
+  m_Name: PG
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2861,6 +2861,8 @@ MonoBehaviour:
   - {fileID: 1259318333}
   - {fileID: 1465348118}
   - {fileID: 791688629}
+  btnName: 
+  isSelected: 0
 --- !u!1 &1610452793
 GameObject:
   m_ObjectHideFlags: 0

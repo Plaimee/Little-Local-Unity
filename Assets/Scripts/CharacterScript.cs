@@ -32,16 +32,54 @@ public class CharacterScript : MonoBehaviour
                 {
                     btnName = little[i].gameObject.name;
                     Debug.Log(btnName + " is selected");
-                    nextBtn.gameObject.SetActive(true);
-                    isSelected = true;
+
+                    // Handle the "random" button
+                    if (btnName == "Random")
+                    {
+                        SelectRandomButton();
+                    }
+                    else
+                    {
+                        nextBtn.gameObject.SetActive(true);
+                        isSelected = true;
+                    }
                     break;
                 }
             }
             previousSelected = selectedLittle;
-        } else if (selectedLittle == null)
+        }
+        else if (selectedLittle == null)
         {
             nextBtn.gameObject.SetActive(false);
             previousSelected = null;
+        }
+    }
+
+    // Method to randomly select a button except "Random"
+    void SelectRandomButton()
+    {
+        List<Button> validButtons = new List<Button>();
+
+        // Exclude the "random" button
+        foreach (Button btn in little)
+        {
+            if (btn.gameObject.name != "Random")
+            {
+                validButtons.Add(btn);
+            }
+        }
+
+        if (validButtons.Count > 0)
+        {
+            int randomIndex = Random.Range(0, validButtons.Count); // Randomly pick an index
+            Button randomButton = validButtons[randomIndex]; // Get the button
+            randomButton.Select(); // Highlight the button
+            Debug.Log(randomButton.gameObject.name + " is randomly selected");
+
+            // Set up the state
+            btnName = randomButton.gameObject.name;
+            nextBtn.gameObject.SetActive(true);
+            isSelected = true;
         }
     }
 }

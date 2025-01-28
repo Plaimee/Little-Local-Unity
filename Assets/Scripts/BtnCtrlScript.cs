@@ -41,6 +41,10 @@ public class BtnCtrlScript : MonoBehaviour
                 break;
 
             case "selectLocationScene":
+                SceneManager.LoadScene("previewScene", LoadSceneMode.Single);
+                break;
+            
+            case "previewScene":
                 SceneManager.LoadScene("cameraScene", LoadSceneMode.Single);
                 break;
         }
@@ -59,8 +63,12 @@ public class BtnCtrlScript : MonoBehaviour
                 SceneManager.LoadScene("selectCharacterScene", LoadSceneMode.Single);
                 break;
 
-            case "cameraScene":
+            case "previewScene":
                 SceneManager.LoadScene("selectLocationScene", LoadSceneMode.Single);
+                break;
+
+            case "cameraScene":
+                SceneManager.LoadScene("previewScene", LoadSceneMode.Single);
                 break;
         }
     }

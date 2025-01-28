@@ -11,6 +11,10 @@ public class LittleCtrlScript : MonoBehaviour
     public GameObject[] gtwEyes;
     public GameObject gtwBody;
     public GameObject[] mouth;
+
+    public GameObject ppGroup;
+    public GameObject ggGroup;
+    public GameObject pgGroup;
     public string littleSelect;
     // Start is called before the first frame update
     void Start()
@@ -33,16 +37,39 @@ public class LittleCtrlScript : MonoBehaviour
             case "Pundaow":
                 pdBody.SetActive(true);
                 gtwBody.SetActive(false);
+                ppGroup.SetActive(false);
+                ggGroup.SetActive(false);
+                pgGroup.SetActive(false);
                 break;
 
             case "Gaewtawan":
                 gtwBody.SetActive(true);
                 pdBody.SetActive(false);
+                ppGroup.SetActive(false);
+                ggGroup.SetActive(false);
+                pgGroup.SetActive(false);
                 break;
 
             case "PP":
+                ppGroup.SetActive(true);
+                gtwBody.SetActive(false);
+                pdBody.SetActive(false);
+                ggGroup.SetActive(false);
+                pgGroup.SetActive(false);
+                break;
+
             case "GG":
+                ggGroup.SetActive(true);
+                ppGroup.SetActive(false);
+                gtwBody.SetActive(false);
+                pdBody.SetActive(false);
+                pgGroup.SetActive(false);
+                break;
+
             case "PG":
+                pgGroup.SetActive(true);
+                ggGroup.SetActive(false);
+                ppGroup.SetActive(false);
                 gtwBody.SetActive(false);
                 pdBody.SetActive(false);
                 break;
