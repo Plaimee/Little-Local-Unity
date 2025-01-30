@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
+using static FirstRawOutputScript;
 
 public class SecRawOutputScript : MonoBehaviour
 {
@@ -67,34 +68,33 @@ public class SecRawOutputScript : MonoBehaviour
 
     public void MatchPosition()
     {
-        if (FirstRawOutputScript.instance == null)
+        if (FirstRawOutputScript.instance == null || FirstRawOutputScript.instance.jsonObjList == null)
         {
-            Debug.LogError("OutputScript instance is null.");
+            Debug.LogError("FirstRawOutputScript instance or jsonObjList is null.");
             return;
         }
 
-        if (FirstRawOutputScript.instance.leftEye != null)
-            UpdatePosition(leftEye, FirstRawOutputScript.instance.leftEye.transform.position);
-
-        if (FirstRawOutputScript.instance.rightEye != null)
-            UpdatePosition(rightEye, FirstRawOutputScript.instance.rightEye.transform.position);
-
-        if (FirstRawOutputScript.instance.nose != null)
-            UpdatePosition(nose, FirstRawOutputScript.instance.nose.transform.position);
-
-        if (FirstRawOutputScript.instance.mouth != null)
-            UpdatePosition(mouth, FirstRawOutputScript.instance.mouth.transform.position);
+        // Iterate over all keypoint data sets
+        foreach (KeypointsData keypoints in FirstRawOutputScript.instance.jsonObjList)
+        {
+            UpdatePosition(leftEye, keypoints.left_eye);
+            UpdatePosition(rightEye, keypoints.right_eye);
+            UpdatePosition(nose, keypoints.nose);
+            UpdatePosition(mouth, keypoints.mouth);
+        }
     }
 
-    private void UpdatePosition(GameObject target, Vector3 sourcePosition)
+    private void UpdatePosition(GameObject target, Keypoint keypoint)
     {
-        if (target != null)
+        if (target != null && keypoint != null)
         {
-            target.transform.position = new Vector3(sourcePosition.x, sourcePosition.y, target.transform.position.z);
+            // Invert the Y position to match the coordinates
+            Vector3 newPos = new Vector3(keypoint.x, -keypoint.y, target.transform.position.z);
+            target.transform.position = newPos;
         }
         else
         {
-            Debug.LogError("Target GameObject is null.");
+            Debug.LogError("Target GameObject or keypoint is null.");
         }
     }
 

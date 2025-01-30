@@ -47,6 +47,10 @@ public class BtnCtrlScript : MonoBehaviour
             case "previewScene":
                 SceneManager.LoadScene("cameraScene", LoadSceneMode.Single);
                 break;
+
+            case "qrCodeScene":
+                SceneManager.LoadScene("startScene", LoadSceneMode.Single);
+                break;
         }
         
     }

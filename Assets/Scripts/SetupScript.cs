@@ -1,6 +1,8 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json;
 using SocketIOClient;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -30,8 +32,8 @@ public class SetupScript : MonoBehaviour
 
             socket.On("keypointUpdate", (data) =>
             {
-                keyPointsData = data.ToString();
-                Debug.Log(keyPointsData);
+                keyPointsData = FixJsonStructure(data.ToString());
+                Debug.Log("Received Cleaned JSON: " + keyPointsData);
                 check = true;
             });
             
@@ -76,6 +78,26 @@ public class SetupScript : MonoBehaviour
 
             }
         }
+    }
+
+    public string FixJsonStructure(string jsonString)
+    {
+        jsonString = jsonString.Trim();
+
+        if (jsonString.StartsWith("\"") && jsonString.EndsWith("\""))
+        {
+            jsonString = jsonString.Substring(1, jsonString.Length - 2); // Remove surrounding quotes
+        }
+
+        jsonString = jsonString.Replace("\\\"", "\""); // Fix escaped quotes
+
+        // Check if JSON starts with double brackets [[ ... ]]
+        if (jsonString.StartsWith("[[") && jsonString.EndsWith("]]"))
+        {
+            jsonString = jsonString.Substring(1, jsonString.Length - 2); // Remove one layer of brackets
+        }
+
+        return jsonString;
     }
 
     public void StartCamera()

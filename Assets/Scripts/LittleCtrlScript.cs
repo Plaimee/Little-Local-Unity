@@ -15,6 +15,9 @@ public class LittleCtrlScript : MonoBehaviour
     public GameObject ppGroup;
     public GameObject ggGroup;
     public GameObject pgGroup;
+    public GameObject face2Element;
+
+
     public string littleSelect;
     // Start is called before the first frame update
     void Start()
@@ -40,6 +43,7 @@ public class LittleCtrlScript : MonoBehaviour
                 ppGroup.SetActive(false);
                 ggGroup.SetActive(false);
                 pgGroup.SetActive(false);
+                face2Element.SetActive(false);
                 break;
 
             case "Gaewtawan":
@@ -48,6 +52,7 @@ public class LittleCtrlScript : MonoBehaviour
                 ppGroup.SetActive(false);
                 ggGroup.SetActive(false);
                 pgGroup.SetActive(false);
+                face2Element.SetActive(false);
                 break;
 
             case "PP":
@@ -56,6 +61,7 @@ public class LittleCtrlScript : MonoBehaviour
                 pdBody.SetActive(false);
                 ggGroup.SetActive(false);
                 pgGroup.SetActive(false);
+                face2Element.SetActive(true);
                 break;
 
             case "GG":
@@ -64,6 +70,7 @@ public class LittleCtrlScript : MonoBehaviour
                 gtwBody.SetActive(false);
                 pdBody.SetActive(false);
                 pgGroup.SetActive(false);
+                face2Element.SetActive(true);
                 break;
 
             case "PG":
@@ -72,6 +79,7 @@ public class LittleCtrlScript : MonoBehaviour
                 ppGroup.SetActive(false);
                 gtwBody.SetActive(false);
                 pdBody.SetActive(false);
+                face2Element.SetActive(true);
                 break;
 
             default:
@@ -82,56 +90,65 @@ public class LittleCtrlScript : MonoBehaviour
 
     public void ActivateRandomGameObject()
     {
-        // Decide which arrays to use based on the active body
-        GameObject[] headArray = pdBody.activeSelf ? pdHead : gtwHead;
-        GameObject[] eyesArrayToEnable = pdBody.activeSelf ? pdEyes : gtwEyes;
-        GameObject[] eyesArrayToDisable = pdBody.activeSelf ? gtwEyes : pdEyes;
-
-        // Deactivate all eyes in the "other" group
-        foreach (GameObject obj in eyesArrayToDisable)
+        try
         {
-            if (obj != null) obj.SetActive(false);
-        }
+            if(!string.IsNullOrEmpty(littleSelect) && littleSelect == "Pundaow" || littleSelect == "Gaewtawan")
+            {
+                GameObject[] headArray = pdBody.activeSelf ? pdHead : gtwHead;
+                GameObject[] eyesArrayToEnable = pdBody.activeSelf ? pdEyes : gtwEyes;
+                GameObject[] eyesArrayToDisable = pdBody.activeSelf ? gtwEyes : pdEyes;
 
-        // Enable all eyes in the active group
-        foreach (GameObject obj in eyesArrayToEnable)
+                // Deactivate all eyes in the "other" group
+                foreach (GameObject obj in eyesArrayToDisable)
+                {
+                    if (obj != null) obj.SetActive(false);
+                }
+
+                // Enable all eyes in the active group
+                foreach (GameObject obj in eyesArrayToEnable)
+                {
+                    if (obj != null) obj.SetActive(true);
+                }
+
+                // Validate arrays
+                if (headArray == null || headArray.Length == 0 || mouth == null || mouth.Length == 0)
+                {
+                    Debug.LogError("No GameObjects assigned to head or mouth arrays, or the arrays are empty!");
+                    return;
+                }
+
+                // Deactivate all objects in headArray and mouth
+                foreach (GameObject obj in headArray)
+                {
+                    if (obj != null) obj.SetActive(false);
+                }
+
+                foreach (GameObject obj in mouth)
+                {
+                    if (obj != null) obj.SetActive(false);
+                }
+
+                // Randomly activate one object in each array
+                int randomHeadIndex = Random.Range(0, headArray.Length);
+                int randomMouthIndex = Random.Range(0, mouth.Length);
+
+                if (headArray[randomHeadIndex] != null)
+                {
+                    headArray[randomHeadIndex].SetActive(true);
+                }
+
+                if (mouth[randomMouthIndex] != null)
+                {
+                    mouth[randomMouthIndex].SetActive(true);
+                }
+
+                Debug.Log($"Activated: {headArray[randomHeadIndex]?.name} and {mouth[randomMouthIndex]?.name}");
+            }
+        }
+        catch
         {
-            if (obj != null) obj.SetActive(true);
+
         }
-
-        // Validate arrays
-        if (headArray == null || headArray.Length == 0 || mouth == null || mouth.Length == 0)
-        {
-            Debug.LogError("No GameObjects assigned to head or mouth arrays, or the arrays are empty!");
-            return;
-        }
-
-        // Deactivate all objects in headArray and mouth
-        foreach (GameObject obj in headArray)
-        {
-            if (obj != null) obj.SetActive(false);
-        }
-
-        foreach (GameObject obj in mouth)
-        {
-            if (obj != null) obj.SetActive(false);
-        }
-
-        // Randomly activate one object in each array
-        int randomHeadIndex = Random.Range(0, headArray.Length);
-        int randomMouthIndex = Random.Range(0, mouth.Length);
-
-        if (headArray[randomHeadIndex] != null)
-        {
-            headArray[randomHeadIndex].SetActive(true);
-        }
-
-        if (mouth[randomMouthIndex] != null)
-        {
-            mouth[randomMouthIndex].SetActive(true);
-        }
-
-        Debug.Log($"Activated: {headArray[randomHeadIndex]?.name} and {mouth[randomMouthIndex]?.name}");
     }
 
     public GameObject GetActiveMouth()
@@ -159,5 +176,14 @@ public class LittleCtrlScript : MonoBehaviour
             }
         }
         return activeEyes.ToArray();
+    }
+
+    private void DisableAllObjects(GameObject[] objects)
+    {
+        if (objects == null) return;
+        foreach (GameObject obj in objects)
+        {
+            if (obj != null) obj.SetActive(false);
+        }
     }
 }

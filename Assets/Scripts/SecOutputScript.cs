@@ -2,11 +2,13 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class SecOutputScript : MonoBehaviour
 {
+    public static SecOutputScript instance;
     public RawImage stamp;
     public string stampPath;
 
@@ -17,17 +19,29 @@ public class SecOutputScript : MonoBehaviour
 
     public string rawOutputPath;
 
+    public TextMeshProUGUI locationThaiName;
+    public string thaiName;
+
+    public TextMeshProUGUI locationLandmark;
+    public string landmark;
+
     private bool check = true;
 
     void Start()
     {
-        stampPath = OutputScript.instance.stampImagePath;
+        instance = this;
+        stampPath = OutputScript.instance.stampImage;
         rawOutputPath = SecRawOutputScript.instance.capImagePath;
+        thaiName = SelectLocationScript.instance.thaiName;
+        landmark = SelectLocationScript.instance.landmark;
+
+        if (thaiName != null) locationThaiName.text = thaiName;
+        if (landmark != null) locationLandmark.text = landmark;
     }
 
     void Update()
     {
-        stampPath = OutputScript.instance.stampImagePath;
+        stampPath = OutputScript.instance.stampImage;
         rawOutputPath = SecRawOutputScript.instance.capImagePath;
         if (check && !string.IsNullOrEmpty(stampPath) && !string.IsNullOrEmpty(rawOutputPath))
         {
