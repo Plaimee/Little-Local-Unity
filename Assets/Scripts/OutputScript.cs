@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
@@ -16,53 +17,39 @@ public class OutputScript : MonoBehaviour
     public RawImage firstOutput;
     public string saveDir = "E:\\work\\BKKDW2024\\photo\\output_01\\";
     public string saveImagePath;
-
     public string rawOutputPath;
 
-    public string checkStamp;
     public RawImage stamp;
-    public string[] stampName = { "stamp003.png" };
-    public string stampPath = Path.Combine(Application.dataPath, "Assets/stamp/");
-    public string stampImagePath;
+    public string stampImage;
+
+    public TextMeshProUGUI locationThaiName;
+    public string thaiName;
+    public TextMeshProUGUI locationLandmark;
+    public string landmark;
 
     private bool check = true;
 
     public void Start()
     {
         instance = this;
-        checkStamp = SelectLocationScript.instance.currentLocationName;
+        stampImage = SelectLocationScript.instance.stampImage;
+        thaiName = SelectLocationScript.instance.thaiName;
+        landmark = SelectLocationScript.instance.landmark;
         rawOutputPath = FirstRawOutputScript.instance.capImagePath;
+
+        if (locationThaiName != null) locationThaiName.text = thaiName;
+        if (locationLandmark != null) locationLandmark.text = landmark;
     }
 
     public void Update()
     {
         rawOutputPath = FirstRawOutputScript.instance.capImagePath;
-        if (check && !string.IsNullOrEmpty(checkStamp) && !string.IsNullOrEmpty(rawOutputPath))
+        if (check && !string.IsNullOrEmpty(stampImage) && !string.IsNullOrEmpty(rawOutputPath))
         {
-            DisplayImages();
             ShowImage(firstOutput, rawOutputPath);
+            ShowImage(stamp, stampImage);
             SaveImage();
             check = false;
-        }
-    }
-
-    public void DisplayImages()
-    {
-        try
-        {
-            if (!string.IsNullOrEmpty(checkStamp) && checkStamp == "003")
-            {
-                stampImagePath = $"{stampPath}{stampName[0]}";
-                ShowImage(stamp, stampImagePath); 
-            }
-            else
-            {
-                Debug.LogError("Location Name is null or empty.");
-            }
-        }
-        catch (Exception ex)
-        {
-            Debug.LogError($"Error displaying images: {ex.Message}");
         }
     }
 

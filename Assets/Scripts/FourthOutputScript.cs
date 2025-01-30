@@ -2,13 +2,14 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using TMPro;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class FourthOutputScript : MonoBehaviour
 {
-
+    public static FourthOutputScript instance;
     public Camera fourthCamera;
     public string saveDir = "E:\\work\\BKKDW2024\\photo\\output_04\\";
     public string saveImagePath;
@@ -16,27 +17,38 @@ public class FourthOutputScript : MonoBehaviour
     public RawImage first;
     public RawImage sec;
     public RawImage third;
-    public RawImage firstCopy;
     public string firstOutput;
     public string secOutput;
     public string thirdOutput;
-    public string firstOutputCopy;
 
     public RawImage stamp;
     public string stampPath;
 
     public GameObject[] stampRand;
 
+    public TextMeshProUGUI locationThaiName;
+    public string thaiName;
+
+    public TextMeshProUGUI locationLandmark;
+    public string landmark;
+
     public bool check = true;
     // Start is called before the first frame update
     void Start()
     {
+        instance = this;
         firstOutput = FirstRawOutputScript.instance.capImagePath;
         secOutput = SecRawOutputScript.instance.capImagePath;
         thirdOutput = ThirdRawOutputScript.instance.capImagePath;
-        firstOutputCopy = FirstRawOutputScript.instance.capImagePath;
-        stampPath = OutputScript.instance.stampImagePath;
+        thaiName = SelectLocationScript.instance.thaiName;
+        landmark = SelectLocationScript.instance.landmark;
+
+        if (thaiName != null) locationThaiName.text = thaiName;
+        if (landmark != null) locationLandmark.text = landmark;
+
+        stampPath = SelectLocationScript.instance.stampImage;
         ActivateRandomGameObject();
+
     }
 
     // Update is called once per frame
@@ -45,15 +57,13 @@ public class FourthOutputScript : MonoBehaviour
         firstOutput = FirstRawOutputScript.instance.capImagePath;
         secOutput = SecRawOutputScript.instance.capImagePath;
         thirdOutput = ThirdRawOutputScript.instance.capImagePath;
-        firstOutputCopy = FirstRawOutputScript.instance.capImagePath;
-        stampPath = OutputScript.instance.stampImagePath;
-        if (check && !string.IsNullOrEmpty(firstOutput) && !string.IsNullOrEmpty(secOutput) && !string.IsNullOrEmpty(thirdOutput) && !string.IsNullOrEmpty(firstOutputCopy) && !string.IsNullOrEmpty(stampPath))
+        stampPath = SelectLocationScript.instance.stampImage;
+        if (check && !string.IsNullOrEmpty(firstOutput) && !string.IsNullOrEmpty(secOutput) && !string.IsNullOrEmpty(thirdOutput) && !string.IsNullOrEmpty(stampPath))
         {
             DisplayImages();
             ShowImage(first, firstOutput);
             ShowImage(sec, secOutput);
             ShowImage(third, thirdOutput);
-            ShowImage(firstCopy, firstOutputCopy);
             SaveCamera();
             check = false;
         }

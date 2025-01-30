@@ -9,6 +9,8 @@ using UnityEngine.UI;
 public class WebcamScript : MonoBehaviour
 {
     public static WebcamScript instance;
+    public GameObject mask;
+    public GameObject coupleMask;
     public RawImage camTexture;
     public TextMeshProUGUI timerText;
     public Image thirdStage;
@@ -35,6 +37,7 @@ public class WebcamScript : MonoBehaviour
         confirmBtn.gameObject.SetActive(false);
         timerText.gameObject.SetActive(false);
 
+        DisableMask();
         SetupScript.instance.StartCamera();
     }
 
@@ -134,5 +137,24 @@ public class WebcamScript : MonoBehaviour
     public void onClickBackBtn()
     {
         SceneManager.LoadScene("selectLocationScene", LoadSceneMode.Single);
+    }
+
+    public void DisableMask()
+    {
+        switch(CharacterScript.instance.btnName)
+        {
+            case "Pundaow":
+            case "Gaewtawan":
+                mask.gameObject.SetActive(true);
+                coupleMask.gameObject.SetActive(false);
+                break;
+
+            case "PG":
+            case "PP":
+            case "GG":
+                coupleMask.gameObject.SetActive(true);
+                mask.gameObject.SetActive(false);
+                break;
+        }
     }
 }
