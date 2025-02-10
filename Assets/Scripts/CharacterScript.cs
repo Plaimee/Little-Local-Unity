@@ -10,13 +10,14 @@ public class CharacterScript : MonoBehaviour
     public Button nextBtn;
     public Button[] little;
     public string btnName;
+    public int max_results;
     GameObject previousSelected;
     public bool isSelected;
     // Start is called before the first frame update
     void Start()
     {
         instance = this;
-        nextBtn.gameObject.SetActive(false);
+        nextBtn.interactable = false;    
     }
 
     void Update()
@@ -33,14 +34,20 @@ public class CharacterScript : MonoBehaviour
                     btnName = little[i].gameObject.name;
                     Debug.Log(btnName + " is selected");
 
+                    if(btnName == "Pundaow" || btnName == "Gaewtawan") {
+                        max_results = 1;
+                    } else {
+                        max_results = 2;
+                    }
+
                     // Handle the "random" button
                     if (btnName == "Random")
                     {
-                        SelectRandomButton();
+                        SelectRandomButton();   
                     }
                     else
                     {
-                        nextBtn.gameObject.SetActive(true);
+                        nextBtn.interactable = true; 
                         isSelected = true;
                     }
                     break;
@@ -50,7 +57,7 @@ public class CharacterScript : MonoBehaviour
         }
         else if (selectedLittle == null)
         {
-            nextBtn.gameObject.SetActive(false);
+            nextBtn.interactable = false;
             previousSelected = null;
         }
     }
@@ -73,13 +80,21 @@ public class CharacterScript : MonoBehaviour
         {
             int randomIndex = Random.Range(0, validButtons.Count); // Randomly pick an index
             Button randomButton = validButtons[randomIndex]; // Get the button
-            randomButton.Select(); // Highlight the button
             Debug.Log(randomButton.gameObject.name + " is randomly selected");
 
             // Set up the state
             btnName = randomButton.gameObject.name;
-            nextBtn.gameObject.SetActive(true);
+            nextBtn.interactable = true; 
             isSelected = true;
+
+            if (btnName == "Pundaow" || btnName == "Gaewtawan")
+            {
+                max_results = 1;
+            }
+            else
+            {
+                max_results = 2;
+            }
         }
     }
 }

@@ -27,6 +27,9 @@ EditorBuildSettings:
     path: Assets/Scenes/outputScene.unity
     guid: d5cbf10c7c9b23f4daf5975447d8c3f5
   - enabled: 1
+    path: Assets/Scenes/noFaceScene.unity
+    guid: c9a6d378fc39e3441ba70b85601697a4
+  - enabled: 1
     path: Assets/Scenes/qrCodeScene.unity
     guid: 09a6621e92d4506408e454b7c6fb7cf5
   m_configObjects:

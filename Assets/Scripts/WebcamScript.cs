@@ -21,7 +21,7 @@ public class WebcamScript : MonoBehaviour
     public Button retakeBtn;
     public Button backBtn;
     public string imgPath;
-    public string imgDir = "E:\\work\\BKKDW2024\\photo\\";
+    public string imgDir = "C:\\BKKDW2025\\photo\\";
 
     // Start is called before the first frame update
     void Start()
@@ -68,10 +68,7 @@ public class WebcamScript : MonoBehaviour
 
     void RetakePhoto()
     {
-        // ปิดใช้งานปุ่ม Retake
         retakeBtn.gameObject.SetActive(false);
-
-        // แสดงกล้องและเริ่มนับถอยหลังใหม่
         camTexture.gameObject.SetActive(true);
         thirdStage.sprite = defaultStage;
         captureBtn.gameObject.SetActive(true);
@@ -96,7 +93,7 @@ public class WebcamScript : MonoBehaviour
         // Emit the image path if the file exists
         if (File.Exists(imgPath))
         {
-            SetupScript.instance.socket.Emit("imgPath", imgPath);
+            SetupScript.instance.socket.Emit("imgPath", new { path = imgPath, max_results = CharacterScript.instance.max_results });
         }
     }
 

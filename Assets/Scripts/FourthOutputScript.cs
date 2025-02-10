@@ -11,16 +11,18 @@ public class FourthOutputScript : MonoBehaviour
 {
     public static FourthOutputScript instance;
     public Camera fourthCamera;
-    public string saveDir = "E:\\work\\BKKDW2024\\photo\\output_04\\";
+    public string saveDir = "C:\\BKKDW2025\\photo\\output_04\\";
     public string saveImagePath;
 
     public RawImage first;
     public RawImage sec;
     public RawImage third;
+    public RawImage fourth;
     public string firstOutput;
     public string secOutput;
     public string thirdOutput;
-
+    public string fouthPath;
+    public string fouthDir = Path.Combine(Application.dataPath, "Assets/location/");
     public RawImage stamp;
     public string stampPath;
 
@@ -31,12 +33,14 @@ public class FourthOutputScript : MonoBehaviour
 
     public TextMeshProUGUI locationLandmark;
     public string landmark;
-
+    public TextMeshProUGUI outputIdText;
+    public string outputId;
     public bool check = true;
     // Start is called before the first frame update
     void Start()
     {
         instance = this;
+        fouthPath = Path.Combine(fouthDir, "output4.png");
         firstOutput = FirstRawOutputScript.instance.capImagePath;
         secOutput = SecRawOutputScript.instance.capImagePath;
         thirdOutput = ThirdRawOutputScript.instance.capImagePath;
@@ -48,7 +52,6 @@ public class FourthOutputScript : MonoBehaviour
 
         stampPath = SelectLocationScript.instance.stampImage;
         ActivateRandomGameObject();
-
     }
 
     // Update is called once per frame
@@ -58,12 +61,15 @@ public class FourthOutputScript : MonoBehaviour
         secOutput = SecRawOutputScript.instance.capImagePath;
         thirdOutput = ThirdRawOutputScript.instance.capImagePath;
         stampPath = SelectLocationScript.instance.stampImage;
-        if (check && !string.IsNullOrEmpty(firstOutput) && !string.IsNullOrEmpty(secOutput) && !string.IsNullOrEmpty(thirdOutput) && !string.IsNullOrEmpty(stampPath))
+        outputId = SetupScript.instance.outputId;
+        if (check && !string.IsNullOrEmpty(firstOutput) && !string.IsNullOrEmpty(secOutput) && !string.IsNullOrEmpty(thirdOutput) && !string.IsNullOrEmpty(stampPath) && !string.IsNullOrEmpty(outputId))
         {
+            outputIdText.text = outputId;
             DisplayImages();
             ShowImage(first, firstOutput);
             ShowImage(sec, secOutput);
             ShowImage(third, thirdOutput);
+            ShowImage(fourth, fouthPath);
             SaveCamera();
             check = false;
         }
