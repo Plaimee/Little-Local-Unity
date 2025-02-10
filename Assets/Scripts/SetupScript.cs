@@ -1,12 +1,16 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using SocketIOClient;
+using Unity.VisualScripting.FullSerializer.Internal;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using Random = UnityEngine.Random;
 
 public class SetupScript : MonoBehaviour
 {
@@ -18,6 +22,17 @@ public class SetupScript : MonoBehaviour
     public string oldKeyPointsData;
     public string annotatedImg;
     public string oldAnnotatedImg;
+    public string removedOrgBg;
+    public string oldRemovedOrgBg;
+    private string characterOutput;
+    private string oldCharacterOutput;
+    private string secondOutput;
+    private string oldSecondOutput;
+    private string finalOutput;
+    private string oldFinalOutput;
+    public string nfdText;
+    public string outputId;
+    public string oldOutputId;
     public bool check;
     // Start is called before the first frame update
     void Start()
@@ -25,7 +40,7 @@ public class SetupScript : MonoBehaviour
         instance = this;
         DontDestroyOnLoad(this.gameObject);
         // Connect Socket
-        socket = new SocketIOUnity("http://localhost:3000/");
+        socket = new SocketIOUnity("http://localhost:3001/");
         socket.OnConnected += (sender, e) =>
         {
             Debug.Log("connect to server");
@@ -36,6 +51,18 @@ public class SetupScript : MonoBehaviour
                 Debug.Log("Received Cleaned JSON: " + keyPointsData);
                 check = true;
             });
+
+            socket.On("outputId", (data) => {
+                outputId = data.ToString().Trim('[', '"', '"', ']');
+                Debug.Log("Received output ID: "+ outputId);
+                check = true;
+            });
+
+            socket.On("removedOrgBg", (data) => {
+                removedOrgBg = data.ToString().Trim('[', '"', '"', ']');
+                Debug.Log(removedOrgBg);
+                check = true;
+            });
             
             socket.On("imageToUnity", (data) =>
             {
@@ -43,40 +70,93 @@ public class SetupScript : MonoBehaviour
                 Debug.Log(annotatedImg);
                 check = true;
             });
+
+            socket.On("noFaceDetected", (data) => {
+                nfdText = data.ToString().Trim('[', '"', '"', ']');
+                Debug.Log(nfdText);
+                check = true;
+            });
         };
         socket.Connect();
 
-        ////Save get the camera devices, in case you have more than 1 camera.
         WebCamDevice[] camDevices = WebCamTexture.devices;
-        //Get the used camera name for the WebCamTexture initialization.
-        string cam = camDevices[0].name;
-        webCamTexture = new WebCamTexture(cam);
+        string cam = camDevices.Length > 1 ? camDevices[1].name : camDevices[0].name;
+        webCamTexture = new WebCamTexture(cam, 1920, 1080, 30);
         webCamImage.texture = webCamTexture;
 
         webCamTexture.Play();
         SceneManager.LoadScene("startScene", LoadSceneMode.Single);
     }
 
-    // Update is called once per frame
     void Update()
     {
-        if(!string.IsNullOrEmpty(keyPointsData))
-        {
-            if(check && keyPointsData != oldKeyPointsData)
-            {
-                oldKeyPointsData = keyPointsData;
-                check = false;
-            }
+        if(check && !string.IsNullOrEmpty(nfdText)){
+            nfdText = null;
+            SceneManager.LoadScene("noFaceScene", LoadSceneMode.Single);
+            check = false;
         }
 
-        if(!string.IsNullOrEmpty(annotatedImg))
-        {
-            if(check && annotatedImg != oldAnnotatedImg)
-            {
-                oldAnnotatedImg = annotatedImg;
-                check = false;
+        CheckAndUpdate(ref keyPointsData, ref oldKeyPointsData);
+        CheckAndUpdate(ref outputId, ref oldOutputId);
+        CheckAndUpdate(ref removedOrgBg, ref oldRemovedOrgBg);
+        CheckAndUpdate(ref annotatedImg, ref oldAnnotatedImg);
 
+        if (OutputScript.instance != null &&
+                !string.IsNullOrEmpty(OutputScript.instance.saveImagePath) &&
+                SecOutputScript.instance != null &&
+                !string.IsNullOrEmpty(SecOutputScript.instance.saveImagePath) &&
+                FourthOutputScript.instance != null &&
+                !string.IsNullOrEmpty(FourthOutputScript.instance.saveImagePath))
+            {
+                characterOutput = OutputScript.instance.saveImagePath;
+                secondOutput = SecOutputScript.instance.saveImagePath;
+                finalOutput = FourthOutputScript.instance.saveImagePath;
+
+                if (CheckAndUpdate(ref characterOutput, ref oldCharacterOutput) &&
+                    CheckAndUpdate(ref secondOutput, ref oldSecondOutput) &&
+                    CheckAndUpdate(ref finalOutput, ref oldFinalOutput))
+                {
+                    SendData(characterOutput, secondOutput, finalOutput);
+                }
             }
+    }
+
+    bool CheckAndUpdate(ref string newValue, ref string oldValue)
+    {
+        if (!string.IsNullOrEmpty(newValue) && newValue != oldValue)
+        {
+            oldValue = newValue;
+            check = false;
+            return true;
+        }
+        return false;
+    }
+
+    public void SendData(string characterOutput, string secondOutput, string finalOutput)
+    {
+        try
+        {
+            if (string.IsNullOrEmpty(outputId))
+            {
+                Debug.LogError("‚ùå No ID not received yet!");
+                return;
+            }
+            var data = new
+            {
+                outputId,
+                characterOutput,
+                secondOutput,
+                finalOutput,
+            };
+
+            if(File.Exists(characterOutput) && File.Exists(secondOutput) && File.Exists(finalOutput)) {
+                socket.Emit("sendData", new { noId = outputId, chaop = characterOutput, secop = secondOutput, fiop = finalOutput });
+                Debug.Log("üì§ Sent Data to Server: " + JsonConvert.SerializeObject(data));
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError("üö® Error sending data: " + ex.Message);
         }
     }
 
@@ -86,15 +166,14 @@ public class SetupScript : MonoBehaviour
 
         if (jsonString.StartsWith("\"") && jsonString.EndsWith("\""))
         {
-            jsonString = jsonString.Substring(1, jsonString.Length - 2); // Remove surrounding quotes
+            jsonString = jsonString.Substring(1, jsonString.Length - 2);
         }
 
-        jsonString = jsonString.Replace("\\\"", "\""); // Fix escaped quotes
+        jsonString = jsonString.Replace("\\\"", "\"");
 
-        // Check if JSON starts with double brackets [[ ... ]]
         if (jsonString.StartsWith("[[") && jsonString.EndsWith("]]"))
         {
-            jsonString = jsonString.Substring(1, jsonString.Length - 2); // Remove one layer of brackets
+            jsonString = jsonString.Substring(1, jsonString.Length - 2);
         }
 
         return jsonString;
@@ -118,10 +197,18 @@ public class SetupScript : MonoBehaviour
 
     public void StopCamera()
     {
-        // À¬ÿ¥°“√∑”ß“π¢Õß°≈ÈÕß
         if (webCamTexture != null && webCamTexture.isPlaying)
         {
             webCamTexture.Stop();
+        }
+    }
+
+    private void OnDestroy()
+    {
+        if (socket != null)
+        {
+            socket.Disconnect();
+            socket.Dispose();
         }
     }
 }

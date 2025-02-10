@@ -4,14 +4,18 @@ using System.IO;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using TMPro;
 
 public class ProcessScripts : MonoBehaviour
 {
+    public static ProcessScripts instance;
     public RawImage orgImage;
     public string orgImagePath;
     private bool sceneLoadTriggered = false;
+    
     void Start()
     {
+        instance = this;      
         orgImagePath = WebcamScript.instance.imgPath;
         ShowImage(orgImage, orgImagePath);
     }

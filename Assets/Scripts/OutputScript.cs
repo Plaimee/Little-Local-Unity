@@ -15,7 +15,7 @@ public class OutputScript : MonoBehaviour
     
     public Camera firstCamera;
     public RawImage firstOutput;
-    public string saveDir = "E:\\work\\BKKDW2024\\photo\\output_01\\";
+    public string saveDir = "C:\\BKKDW2025\\photo\\output_01\\";
     public string saveImagePath;
     public string rawOutputPath;
 
@@ -26,7 +26,8 @@ public class OutputScript : MonoBehaviour
     public string thaiName;
     public TextMeshProUGUI locationLandmark;
     public string landmark;
-
+    public TextMeshProUGUI outputIdText;
+    public string outputId;
     private bool check = true;
 
     public void Start()
@@ -44,8 +45,10 @@ public class OutputScript : MonoBehaviour
     public void Update()
     {
         rawOutputPath = FirstRawOutputScript.instance.capImagePath;
-        if (check && !string.IsNullOrEmpty(stampImage) && !string.IsNullOrEmpty(rawOutputPath))
+        outputId = SetupScript.instance.outputId;
+        if (check && !string.IsNullOrEmpty(stampImage) && !string.IsNullOrEmpty(rawOutputPath) && !string.IsNullOrEmpty(outputId))
         {
+            outputIdText.text = outputId;
             ShowImage(firstOutput, rawOutputPath);
             ShowImage(stamp, stampImage);
             SaveImage();

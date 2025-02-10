@@ -13,7 +13,7 @@ public class FirstRawOutputScript : MonoBehaviour
     public RawImage locationImage;
 
     public Camera rawOutput;
-    public string capDir = "E:\\work\\BKKDW2024\\photo\\element_output_04\\firstOutput\\";
+    public string capDir = "C:\\BKKDW2025\\photo\\element_output_04\\firstOutput\\";
     public string capImagePath;
 
     public List<KeypointsData> jsonObjList;
@@ -22,7 +22,6 @@ public class FirstRawOutputScript : MonoBehaviour
     public GameObject[] rightEyes;
     public GameObject[] noses;
     public GameObject[] mouths;
-
     private bool check = true;
 
     [System.Serializable]
@@ -51,23 +50,26 @@ public class FirstRawOutputScript : MonoBehaviour
 
     private void Update()
     {
-        kpObj = SetupScript.instance.keyPointsData;
-        if (check || !string.IsNullOrEmpty(kpObj) || !string.IsNullOrEmpty(locationSelected))
-        {
-            UpdateKeypointData(kpObj);
-            if (jsonObjList != null && jsonObjList.Count > 0)
+        if(SetupScript.instance.keyPointsData != null && !string.IsNullOrEmpty(SetupScript.instance.keyPointsData) && SelectLocationScript.instance.locationImage != null && !string.IsNullOrEmpty(SelectLocationScript.instance.locationImage)) {
+            kpObj = SetupScript.instance.keyPointsData;
+            locationSelected = SelectLocationScript.instance.locationImage;
+            if (check && !string.IsNullOrEmpty(kpObj) && !string.IsNullOrEmpty(locationSelected))
             {
-                for (int i = 0; i < jsonObjList.Count; i++)
+                UpdateKeypointData(kpObj);
+                if (jsonObjList != null && jsonObjList.Count > 0)
                 {
-                    UpdateKeypointPositions(jsonObjList[i], i);
+                    for (int i = 0; i < jsonObjList.Count; i++)
+                    {
+                        UpdateKeypointPositions(jsonObjList[i], i);
+                    }
+                    ShowImage(locationImage, locationSelected);
+                    SaveRawOutput();
+                    check = false;
                 }
-                ShowImage(locationImage, locationSelected);
-                SaveRawOutput();
-                check = false;
-            }
-            else
-            {
-                Debug.LogError("Parsed keypoints data is null!");
+                else
+                {
+                    Debug.LogError("Parsed keypoints data is null!");
+                }
             }
         }
     }

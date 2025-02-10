@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.UI;
 using static FirstRawOutputScript;
@@ -9,92 +10,115 @@ using static FirstRawOutputScript;
 public class SecRawOutputScript : MonoBehaviour
 {
     public static SecRawOutputScript instance;
-    public GameObject[] pdEyes;
-    public GameObject[] gtwEyes;
-    public GameObject[] matchMouth;
-    public GameObject leftEye;
-    public GameObject rightEye;
-    public GameObject nose;
-    public GameObject mouth;
+    [System.Serializable]
+    public class KeypointsData
+    {
+        public int face_id;
+        public Keypoint left_eye;
+        public Keypoint right_eye;
+        public Keypoint nose;
+        public Keypoint mouth;
+    }
 
+    [System.Serializable]
+    public class Keypoint
+    {
+        public float x;
+        public float y;
+    }
+    public GameObject[] leftEyes, rightEyes, noses, mouths;
+    public List<KeypointsData> jsonObjList;
+    public string kpObj;
+    public RawImage locationImage;
     public RawImage orgImage;
     public string orgImagePath;
-
     public RawImage colorBg;
     public Vector2 uvCoordinates;
-
     public Camera rawOutput;
-    public string capDir = "E:\\work\\BKKDW2024\\photo\\element_output_04\\secondOutput\\";
+    public string capDir = "C:\\BKKDW2025\\photo\\element_output_04\\secondOutput\\";
     public string capImagePath;
-
+    public GameObject[] cloud;
+    public int cloudIndex;
     private bool check = true;
 
     void Start()
     {
         instance = this;
-        orgImagePath = WebcamScript.instance.imgPath;
-        ShowImage(orgImage, orgImagePath);
+        kpObj = SetupScript.instance.keyPointsData;
+        orgImagePath = SetupScript.instance.removedOrgBg;
+        ActivateRandomCloud();
     }
 
     void Update()
     {
-        LittleCtrlScript littleCtrl = FindObjectOfType<LittleCtrlScript>();
-        if (littleCtrl != null)
-        {
-            MatchActiveGameObjects(littleCtrl);
-        }
-        else
-        {
-            Debug.LogError("LittleCtrlScript instance not found in the scene.");
-        }
-
-        if (check || string.IsNullOrEmpty(orgImagePath))
-        {
-            orgImagePath = WebcamScript.instance.imgPath;
-            if (!string.IsNullOrEmpty(orgImagePath))
+        if(SetupScript.instance.keyPointsData != null && !string.IsNullOrEmpty(SetupScript.instance.keyPointsData) && SetupScript.instance.removedOrgBg != null && !string.IsNullOrEmpty(SetupScript.instance.removedOrgBg)) {
+            kpObj = SetupScript.instance.keyPointsData;
+            orgImagePath = SetupScript.instance.removedOrgBg;
+            if (check && !string.IsNullOrEmpty(kpObj) && !string.IsNullOrEmpty(orgImagePath) && kpObj == FirstRawOutputScript.instance.kpObj && locationImage != null)
             {
-                MatchPosition();
-                PickColor();
-                SaveRawOutput();
+                UpdateKeypointData(kpObj);
+                if (jsonObjList != null && jsonObjList.Count > 0)
+                {
+                    for (int i = 0; i < jsonObjList.Count; i++)
+                    {
+                        UpdateKeypointPositions(jsonObjList[i], i);
+                    }
+                    ShowImage(orgImage, orgImagePath);
+                    PickColor();
+                    SaveRawOutput();
+                    check = false;
+                }
+                else
+                {
+                    Debug.LogError("Parsed keypoints data is null!");
+                }
             }
-            else
-            {
-                Debug.LogError("stampPath or annotatedImgPath is null");
-            }
-            check = false;
         }
-
     }
 
-    public void MatchPosition()
+    public void UpdateKeypointPositions(KeypointsData keypoints, int index)
     {
-        if (FirstRawOutputScript.instance == null || FirstRawOutputScript.instance.jsonObjList == null)
+        if (index >= leftEyes.Length || index >= rightEyes.Length || index >= noses.Length || index >= mouths.Length)
         {
-            Debug.LogError("FirstRawOutputScript instance or jsonObjList is null.");
+            Debug.LogError($"Index {index} is out of range for keypoint objects.");
             return;
         }
 
-        // Iterate over all keypoint data sets
-        foreach (KeypointsData keypoints in FirstRawOutputScript.instance.jsonObjList)
-        {
-            UpdatePosition(leftEye, keypoints.left_eye);
-            UpdatePosition(rightEye, keypoints.right_eye);
-            UpdatePosition(nose, keypoints.nose);
-            UpdatePosition(mouth, keypoints.mouth);
-        }
+        if (keypoints.left_eye != null && leftEyes[index] != null)
+            leftEyes[index].GetComponent<RectTransform>().anchoredPosition = new Vector3(keypoints.left_eye.x, -keypoints.left_eye.y, 0);
+
+        if (keypoints.right_eye != null && rightEyes[index] != null)
+            rightEyes[index].GetComponent<RectTransform>().anchoredPosition = new Vector3(keypoints.right_eye.x, -keypoints.right_eye.y, 0);
+
+        if (keypoints.nose != null && noses[index] != null)
+            noses[index].GetComponent<RectTransform>().anchoredPosition = new Vector3(keypoints.nose.x, -keypoints.nose.y, 0);
+
+        if (keypoints.mouth != null && mouths[index] != null)
+            mouths[index].GetComponent<RectTransform>().anchoredPosition = new Vector3(keypoints.mouth.x, -keypoints.mouth.y, 0);
     }
 
-    private void UpdatePosition(GameObject target, Keypoint keypoint)
+    // Deserialize keypoints data from JSON string and store it
+    public void UpdateKeypointData(string keypointsJson)
     {
-        if (target != null && keypoint != null)
+        try
         {
-            // Invert the Y position to match the coordinates
-            Vector3 newPos = new Vector3(keypoint.x, -keypoint.y, target.transform.position.z);
-            target.transform.position = newPos;
+            if (string.IsNullOrEmpty(keypointsJson) || keypointsJson == "[]")
+            {
+                Debug.LogError("Received empty or invalid JSON data.");
+                return;
+            }
+
+            // Deserialize JSON safely
+            jsonObjList = JsonConvert.DeserializeObject<List<KeypointsData>>(keypointsJson);
+
+            if (jsonObjList == null || jsonObjList.Count == 0)
+            {
+                Debug.LogError("Parsed keypoints data is null or empty!");
+            }
         }
-        else
+        catch (Exception ex)
         {
-            Debug.LogError("Target GameObject or keypoint is null.");
+            Debug.LogError($"Error parsing keypoints data: {ex.Message}\nJSON Data: {keypointsJson}");
         }
     }
 
@@ -123,30 +147,92 @@ public class SecRawOutputScript : MonoBehaviour
 
     public void PickColor()
     {
-        if (orgImage.texture is Texture2D texture2D)
+        if (orgImage.texture is Texture2D texture2D && locationImage.texture is Texture2D locationTexture)
         {
-            if (!texture2D.isReadable)
+            if (!texture2D.isReadable || !locationTexture.isReadable)
             {
-                Debug.LogError("Texture is not readable. Enable 'Read/Write Enabled' in the texture's import settings.");
+                Debug.LogError("One or both textures are not readable. Enable 'Read/Write Enabled' in the texture's import settings.");
                 return;
             }
 
-            // Convert UV coordinates (0-1) to pixel coordinates
-            int x = Mathf.Clamp((int)(uvCoordinates.x * texture2D.width), 0, texture2D.width - 1);
-            int y = Mathf.Clamp((int)(uvCoordinates.y * texture2D.height), 0, texture2D.height - 1);
+            // Generate random UV coordinates
+            Vector2 uv1 = new Vector2(UnityEngine.Random.value, UnityEngine.Random.value);
+            Vector2 uv2 = new Vector2(UnityEngine.Random.value, UnityEngine.Random.value);
 
-            // Get the color from the pixel
-            Color pickedColor = texture2D.GetPixel(x, y);
+            // Convert UV to pixel coordinates for orgImage
+            int x1 = Mathf.Clamp((int)(uv1.x * texture2D.width), 0, texture2D.width - 1);
+            int y1 = Mathf.Clamp((int)(uv1.y * texture2D.height), 0, texture2D.height - 1);
 
-            // Apply the color to the colorBg RawImage
-            colorBg.color = pickedColor;
+            // Convert UV to pixel coordinates for locationImage
+            int x2 = Mathf.Clamp((int)(uv2.x * locationTexture.width), 0, locationTexture.width - 1);
+            int y2 = Mathf.Clamp((int)(uv2.y * locationTexture.height), 0, locationTexture.height - 1);
 
-            Debug.Log($"Picked Color: {pickedColor}");
+            // Pick two colors: one from orgImage, one from locationImage
+            Color color1 = texture2D.GetPixel(x1, y1);
+            Color color2 = locationTexture.GetPixel(x2, y2);
+
+            // Generate a gradient texture
+            Texture2D gradientTexture = CreateGradientTexture(color1, color2, 256);
+
+            // Apply the gradient texture to colorBg
+            colorBg.texture = gradientTexture;
+
+            Debug.Log($"Picked Colors: {color1} from orgImage, {color2} from locationImage");
         }
         else
         {
-            Debug.LogError("Source texture is not a Texture2D or is missing.");
+            Debug.LogError("One or both source textures are not a Texture2D or are missing.");
         }
+    }
+
+    private Texture2D CreateGradientTexture(Color color1, Color color2, int height)
+    {
+        int width = 1; // Single-column texture for vertical gradient
+        Texture2D gradientTexture = new Texture2D(width, height);
+
+        for (int y = 0; y < height; y++)
+        {
+            float t = y / (float)(height - 1);
+            Color gradientColor = Color.Lerp(color1, color2, t); // Top to Bottom
+            gradientTexture.SetPixel(0, y, gradientColor);
+        }
+
+        gradientTexture.Apply();
+        return gradientTexture;
+    }
+
+    public void ActivateRandomCloud()
+    {
+        if(cloud != null) {
+            DisableAllObjects(cloud);
+
+            cloudIndex = ActivateRandomCloud(cloud);
+        }
+    }
+
+    private int ActivateRandomCloud(GameObject[] objects)
+    {
+        if (objects == null || objects.Length == 0) return -1;
+
+        int randomIndex = UnityEngine.Random.Range(0, objects.Length);
+
+        if (objects[randomIndex] != null)
+        {
+            objects[randomIndex].SetActive(true);
+            Debug.Log("Activated: " + objects[randomIndex].name);
+        }
+
+        return randomIndex;
+    }
+
+    private void DisableAllObjects(GameObject[] objects)
+    {
+        if (objects == null) return;
+        foreach (GameObject obj in objects)
+        {
+            if (obj != null) obj.SetActive(false);
+        }
+        
     }
 
     public void SaveRawOutput()
@@ -193,70 +279,6 @@ public class SecRawOutputScript : MonoBehaviour
         catch (Exception ex)
         {
             Debug.LogError($"Error saving camera view: {ex.Message}");
-        }
-    }
-
-    public void MatchActiveGameObjects(LittleCtrlScript littleCtrl)
-    {
-        if (littleCtrl == null)
-        {
-            Debug.LogError("LittleCtrlScript instance is null.");
-            return;
-        }
-
-        // Get active objects from LittleCtrlScript
-        GameObject[] activeEyes = littleCtrl.GetActiveEyes();
-        GameObject activeMouth = littleCtrl.GetActiveMouth();
-
-        // Deactivate all pdEyes objects
-        foreach (GameObject eye in pdEyes)
-        {
-            if (eye != null)
-                eye.SetActive(false);
-        }
-
-        // Activate matching pdEyes objects
-        foreach (GameObject activeEye in activeEyes)
-        {
-            for (int i = 0; i < pdEyes.Length; i++)
-            {
-                if (pdEyes[i] == activeEye && pdEyes[i] != null)
-                {
-                    pdEyes[i].SetActive(true);
-                    Debug.Log($"Activated pdEye: {pdEyes[i].name}");
-                }
-            }
-        }
-
-        // Deactivate all matchMouth objects
-        foreach (GameObject mouthObj in matchMouth)
-        {
-            if (mouthObj != null)
-                mouthObj.SetActive(false);
-        }
-
-        // Activate the matching mouth object
-        if (activeMouth != null)
-        {
-            bool mouthFound = false;
-            for (int i = 0; i < matchMouth.Length; i++)
-            {
-                if (matchMouth[i] != null && matchMouth[i].name == activeMouth.name)
-                {
-                    matchMouth[i].SetActive(true);
-                    mouthFound = true;
-                    break;
-                }
-            }
-
-            if (!mouthFound)
-            {
-                Debug.LogWarning($"Active mouth '{activeMouth.name}' not found in matchMouth array.");
-            }
-        }
-        else
-        {
-            Debug.LogWarning("No active mouth detected from LittleCtrlScript.");
         }
     }
 }

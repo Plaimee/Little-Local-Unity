@@ -1,8 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class SelectLocationScript : MonoBehaviour
 {
@@ -18,8 +20,9 @@ public class SelectLocationScript : MonoBehaviour
     public string locationImage;
     public string[] locationName = { "TigerGodShrine.png", "TaisunBar.png", "PrinceSommotAmornphanPalace.png", "MahannoparamTemple.png" };
     public string locationDir = Path.Combine(Application.dataPath, "Assets/location/");
+    public TextMeshProUGUI placename;
     public string thaiName;
-    public string[] locationThaiName = { "»“≈‡®È“æËÕ‡ ◊Õ", "‰∑Ë´ÿπ ∫“√Ï", "«—ß°√¡æ√– ¡¡µÕ¡√æ—π∏ÿÏ", "«—¥¡À√√≥æ“√“¡" };
+    public string[] locationThaiName = { "‡∏®‡∏≤‡∏•‡πÄ‡∏à‡πâ‡∏≤‡∏û‡πà‡∏≠‡πÄ‡∏™‡∏∑‡∏≠", "‡πÑ‡∏ó‡πà‡∏Ç‡∏∏‡∏ô ‡∏ö‡∏≤‡∏£‡πå", "‡∏ß‡∏±‡∏á‡∏Å‡∏£‡∏°‡∏û‡∏£‡∏∞‡∏™‡∏°‡∏°‡∏ï‡∏≠‡∏°‡∏£‡∏û‡∏±‡∏ô‡∏û‡∏ò‡πå‡∏∏", "‡∏ß‡∏±‡∏î‡∏°‡∏´‡∏£‡∏£‡∏ì‡∏û‡∏≤‡∏£‡∏≤‡∏°" };
     public string landmark;
     public string[] locationLandmarks = { "13.7538779,100.4969511", "13.752885,100.5036473", "13.7525207,100.5019529", "13.754736,100.4993281" };
     public string stampImage;
@@ -31,7 +34,7 @@ public class SelectLocationScript : MonoBehaviour
     void Start()
     {
         instance = this;
-
+        
         if (layoutLocation != null)
         {
             layoutRectTransform = layoutLocation.GetComponent<RectTransform>();
@@ -40,6 +43,8 @@ public class SelectLocationScript : MonoBehaviour
         {
             Debug.LogError("Horizontal Layout Group is not assigned.");
         }
+
+        UpdateCurrentLocation();
 
         if (nextLocation != null && previousLocation != null && checkCurrent != null)
         {
@@ -137,6 +142,7 @@ public class SelectLocationScript : MonoBehaviour
     {
         currentLocationName = layoutLocation.transform.GetChild(currentIndex).gameObject.name;
         MatchDetail();
+        placename.text = thaiName;
     }
 
     public void MatchDetail()

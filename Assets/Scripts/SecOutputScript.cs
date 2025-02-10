@@ -14,7 +14,7 @@ public class SecOutputScript : MonoBehaviour
 
     public Camera secCamera;
     public RawImage secOutput;
-    public string saveDir = "E:\\work\\BKKDW2024\\photo\\output_02\\";
+    public string saveDir = "C:\\BKKDW2025\\photo\\output_02\\";
     public string saveImagePath;
 
     public string rawOutputPath;
@@ -24,7 +24,8 @@ public class SecOutputScript : MonoBehaviour
 
     public TextMeshProUGUI locationLandmark;
     public string landmark;
-
+    public TextMeshProUGUI outputIdText;
+    public string outputId;
     private bool check = true;
 
     void Start()
@@ -43,8 +44,10 @@ public class SecOutputScript : MonoBehaviour
     {
         stampPath = OutputScript.instance.stampImage;
         rawOutputPath = SecRawOutputScript.instance.capImagePath;
-        if (check && !string.IsNullOrEmpty(stampPath) && !string.IsNullOrEmpty(rawOutputPath))
+        outputId = SetupScript.instance.outputId;
+        if (check && !string.IsNullOrEmpty(stampPath) && !string.IsNullOrEmpty(rawOutputPath) && !string.IsNullOrEmpty(outputId))
         {
+            outputIdText.text = outputId;
             DisplayImages();
             ShowImage(secOutput, rawOutputPath);
             SaveImage();
