@@ -15,7 +15,7 @@ public class ProcessScripts : MonoBehaviour
     
     void Start()
     {
-        instance = this;      
+        instance = this;     
         orgImagePath = WebcamScript.instance.imgPath;
         ShowImage(orgImage, orgImagePath);
     }
@@ -31,20 +31,20 @@ public class ProcessScripts : MonoBehaviour
 
     private bool AllImagesExist()
     {
-        return !string.IsNullOrEmpty(FirstRawOutputScript.instance.capImagePath) &&
-               !string.IsNullOrEmpty(OutputScript.instance.saveImagePath) &&
-               !string.IsNullOrEmpty(SecRawOutputScript.instance.capImagePath) &&
-               !string.IsNullOrEmpty(SecOutputScript.instance.saveImagePath) &&
-               !string.IsNullOrEmpty(ThirdRawOutputScript.instance.capImagePath) &&
-               !string.IsNullOrEmpty(ThirdOutputScript.instance.saveImagePath) &&
-               !string.IsNullOrEmpty(FourthOutputScript.instance.saveImagePath) &&
-               File.Exists(FirstRawOutputScript.instance.capImagePath) &&
-               File.Exists(OutputScript.instance.saveImagePath) &&
-               File.Exists(SecRawOutputScript.instance.capImagePath) &&
-               File.Exists(SecOutputScript.instance.saveImagePath) &&
-               File.Exists(ThirdRawOutputScript.instance.capImagePath) &&
-               File.Exists(ThirdOutputScript.instance.saveImagePath) &&
-               File.Exists(FourthOutputScript.instance.saveImagePath);
+        return !string.IsNullOrEmpty(OutputFirstRawScript.instance.capImagePath) &&
+               !string.IsNullOrEmpty(OutputFirstWithFrameScript.instance.saveImagePath) &&
+               !string.IsNullOrEmpty(OutputSecondRawScript.instance.capImagePath) &&
+               !string.IsNullOrEmpty(OutputSecondWithFrameScript.instance.saveImagePath) &&
+               !string.IsNullOrEmpty(OutputThirdRawScript.instance.capImagePath) &&
+               !string.IsNullOrEmpty(OutputThirdWithFrameScript.instance.saveImagePath) &&
+               !string.IsNullOrEmpty(OutputFourthWithFrameScript.instance.saveImagePath) &&
+               File.Exists(OutputFirstRawScript.instance.capImagePath) &&
+               File.Exists(OutputFirstWithFrameScript.instance.saveImagePath) &&
+               File.Exists(OutputSecondRawScript.instance.capImagePath) &&
+               File.Exists(OutputSecondWithFrameScript.instance.saveImagePath) &&
+               File.Exists(OutputThirdRawScript.instance.capImagePath) &&
+               File.Exists(OutputThirdWithFrameScript.instance.saveImagePath) &&
+               File.Exists(OutputFourthWithFrameScript.instance.saveImagePath);
     }
 
     private IEnumerator LoadSceneWithDelay(float delay)
