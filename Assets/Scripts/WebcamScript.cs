@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -86,7 +87,7 @@ public class WebcamScript : MonoBehaviour
 
         byte[] bytes = webcamTexture2D.EncodeToPNG();
 
-        imgPath = imgDir + System.DateTime.Now.ToString("dd_MM_yyyy_HHmmss") + ".png";
+        imgPath = Path.Combine(imgDir, $"{DateTime.Now:yyyyMMdd_HHmmss}.png");
         File.WriteAllBytes(imgPath, bytes);
         Debug.Log("Full image saved at: " + imgPath);
 

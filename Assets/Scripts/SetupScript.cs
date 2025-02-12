@@ -34,17 +34,20 @@ public class SetupScript : MonoBehaviour
     public string outputId;
     public string oldOutputId;
     public bool check;
-    // Start is called before the first frame update
+    private bool isQRSceneActive = false;
+    public bool hasResetAfterQR = false;
+
     void Start()
     {
         instance = this;
         DontDestroyOnLoad(this.gameObject);
+        SceneManager.sceneLoaded += OnSceneLoaded;
+        
         // Connect Socket
         socket = new SocketIOUnity("http://localhost:3001/");
         socket.OnConnected += (sender, e) =>
         {
             Debug.Log("connect to server");
-
             socket.On("keypointUpdate", (data) =>
             {
                 keyPointsData = FixJsonStructure(data.ToString());
@@ -90,8 +93,8 @@ public class SetupScript : MonoBehaviour
 
     void Update()
     {
+        // เมื่อไม่พบใบหน้า รีเซ็ตข้อมูลและไปยังซีนที่เกี่ยวข้อง
         if(check && !string.IsNullOrEmpty(nfdText)){
-            nfdText = null;
             SceneManager.LoadScene("noFaceScene", LoadSceneMode.Single);
             check = false;
         }
@@ -101,24 +104,56 @@ public class SetupScript : MonoBehaviour
         CheckAndUpdate(ref removedOrgBg, ref oldRemovedOrgBg);
         CheckAndUpdate(ref annotatedImg, ref oldAnnotatedImg);
 
-        if (OutputScript.instance != null &&
-                !string.IsNullOrEmpty(OutputScript.instance.saveImagePath) &&
-                SecOutputScript.instance != null &&
-                !string.IsNullOrEmpty(SecOutputScript.instance.saveImagePath) &&
-                FourthOutputScript.instance != null &&
-                !string.IsNullOrEmpty(FourthOutputScript.instance.saveImagePath))
-            {
-                characterOutput = OutputScript.instance.saveImagePath;
-                secondOutput = SecOutputScript.instance.saveImagePath;
-                finalOutput = FourthOutputScript.instance.saveImagePath;
+        if (OutputFirstWithFrameScript.instance != null &&
+            !string.IsNullOrEmpty(OutputFirstWithFrameScript.instance.saveImagePath) &&
+            OutputSecondWithFrameScript.instance != null &&
+            !string.IsNullOrEmpty(OutputSecondWithFrameScript.instance.saveImagePath) &&
+            OutputFourthWithFrameScript.instance != null &&
+            !string.IsNullOrEmpty(OutputFourthWithFrameScript.instance.saveImagePath))
+        {
+            characterOutput = OutputFirstWithFrameScript.instance.saveImagePath;
+            secondOutput = OutputSecondWithFrameScript.instance.saveImagePath;
+            finalOutput = OutputFourthWithFrameScript.instance.saveImagePath;
 
-                if (CheckAndUpdate(ref characterOutput, ref oldCharacterOutput) &&
-                    CheckAndUpdate(ref secondOutput, ref oldSecondOutput) &&
-                    CheckAndUpdate(ref finalOutput, ref oldFinalOutput))
-                {
-                    SendData(characterOutput, secondOutput, finalOutput);
-                }
+            if (CheckAndUpdate(ref characterOutput, ref oldCharacterOutput) &&
+                CheckAndUpdate(ref secondOutput, ref oldSecondOutput) &&
+                CheckAndUpdate(ref finalOutput, ref oldFinalOutput))
+            {
+                SendData(characterOutput, secondOutput, finalOutput);
             }
+        }
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        isQRSceneActive = scene.name == "qrCodeScene";
+        Debug.Log($"Scene loaded: {scene.name}, isQRSceneActive: {isQRSceneActive}");
+    }
+
+    public void ResetSocketData()
+    {
+        keyPointsData = null;
+        oldKeyPointsData = null;
+        annotatedImg = null;
+        oldAnnotatedImg = null;
+        removedOrgBg = null;
+        oldRemovedOrgBg = null;
+        characterOutput = null;
+        oldCharacterOutput = null;
+        secondOutput = null;
+        oldSecondOutput = null;
+        finalOutput = null;
+        oldFinalOutput = null;
+        nfdText = null;
+
+        if (hasResetAfterQR)
+        {
+            outputId = null;
+            oldOutputId = null;
+        }
+
+        check = true;
+        Debug.Log("Reset socket data completed");
     }
 
     bool CheckAndUpdate(ref string newValue, ref string oldValue)

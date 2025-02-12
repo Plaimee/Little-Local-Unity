@@ -8,8 +8,9 @@ using TMPro;
 using ZXing;
 using ZXing.QrCode;
 
-public class QrCodeScript : MonoBehaviour
+public class QRCodeScript : MonoBehaviour
 {
+    public static QRCodeScript instance;
     public GameObject[] little;
     public string littleSelected;
     public RawImage orgImage;
@@ -23,10 +24,22 @@ public class QrCodeScript : MonoBehaviour
     public RawImage qrCode;
     public string qrUrl;
     public string fullQrUrl;
+    private bool hasInitialized = false;
 
-    // Start is called before the first frame update
     void Start()
     {
+        instance = this;
+        InitializeQRCode();
+    }
+
+    private void InitializeQRCode()
+    {
+        if (string.IsNullOrEmpty(SetupScript.instance.outputId))
+        {
+            Debug.LogError("Output ID is null or empty");
+            return;
+        }
+
         qrUrl = "https://funcslash.com/projects/2025/lclm/get.php?noId=";
         orgImagePath = WebcamScript.instance.imgPath;
         locationSelected = SelectLocationScript.instance.locationImage;
@@ -34,6 +47,7 @@ public class QrCodeScript : MonoBehaviour
         littleSelected = CharacterScript.instance.btnName;
         outputId = SetupScript.instance.outputId;
         fullQrUrl = qrUrl + outputId;
+
         GenerateQrCodeFromPath(fullQrUrl);
         ShowImage(orgImage, orgImagePath);
         ShowImage(location, locationSelected);
@@ -41,7 +55,27 @@ public class QrCodeScript : MonoBehaviour
         DeactivateAllLittle();
         ActivateMatchingLittle();
 
-        if(outputId != null) outputIdText.text = outputId;
+        if(!string.IsNullOrEmpty(outputId))
+        {
+            outputIdText.text = outputId;
+            Debug.Log($"Set output ID text: {outputId}");
+            StartCoroutine(ResetSocketAfterDelay());
+        }
+
+        hasInitialized = true;
+    }
+
+    private IEnumerator ResetSocketAfterDelay()
+    {
+        // รอให้ QR Code และองค์ประกอบอื่นๆ แสดงผลเสร็จ
+        yield return new WaitForSeconds(2f);
+        
+        if (SetupScript.instance != null)
+        {
+            SetupScript.instance.hasResetAfterQR = true;
+            SetupScript.instance.ResetSocketData();
+            Debug.Log("Reset socket data after QR Code generation");
+        }
     }
     void DeactivateAllLittle()
     {

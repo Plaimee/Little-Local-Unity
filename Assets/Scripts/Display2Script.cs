@@ -34,14 +34,32 @@ public class Display2Script : MonoBehaviour
 
     void Update()
     {
-        if(FourthOutputScript.instance != null && !string.IsNullOrEmpty(FourthOutputScript.instance.saveImagePath)) {
-            outputPath = FourthOutputScript.instance.saveImagePath;
+        if(AllImagesExist()) {
+            outputPath = OutputFourthWithFrameScript.instance.saveImagePath;
             if(outputPath != oldOutputPath) {
                 oldOutputPath = outputPath;
                 output.gameObject.SetActive(false);
                 StartCoroutine(RepeatedMoveAnimation());
             }
         } 
+    }
+
+    private bool AllImagesExist()
+    {
+        return !string.IsNullOrEmpty(OutputFirstRawScript.instance.capImagePath) &&
+               !string.IsNullOrEmpty(OutputFirstWithFrameScript.instance.saveImagePath) &&
+               !string.IsNullOrEmpty(OutputSecondRawScript.instance.capImagePath) &&
+               !string.IsNullOrEmpty(OutputSecondWithFrameScript.instance.saveImagePath) &&
+               !string.IsNullOrEmpty(OutputThirdRawScript.instance.capImagePath) &&
+               !string.IsNullOrEmpty(OutputThirdWithFrameScript.instance.saveImagePath) &&
+               !string.IsNullOrEmpty(OutputFourthWithFrameScript.instance.saveImagePath) &&
+               File.Exists(OutputFirstRawScript.instance.capImagePath) &&
+               File.Exists(OutputFirstWithFrameScript.instance.saveImagePath) &&
+               File.Exists(OutputSecondRawScript.instance.capImagePath) &&
+               File.Exists(OutputSecondWithFrameScript.instance.saveImagePath) &&
+               File.Exists(OutputThirdRawScript.instance.capImagePath) &&
+               File.Exists(OutputThirdWithFrameScript.instance.saveImagePath) &&
+               File.Exists(OutputFourthWithFrameScript.instance.saveImagePath);
     }
 
     public void ShowImage(RawImage imageContainer, string imagePath)
