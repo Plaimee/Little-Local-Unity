@@ -8,6 +8,7 @@ using Newtonsoft.Json.Linq;
 using SocketIOClient;
 using Unity.VisualScripting.FullSerializer.Internal;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using Random = UnityEngine.Random;
@@ -16,6 +17,11 @@ public class SetupScript : MonoBehaviour
 {
     public SocketIOUnity socket;
     public static SetupScript instance;
+    public float lastInteractionTime;
+    public float inactivityTimeout = 300f; 
+    private bool isStartScene = false;
+    public GameObject noInternetMessage;
+    public float checkInterval = 5f;
     public WebCamTexture webCamTexture;
     public RawImage webCamImage;
     public string keyPointsData;
@@ -42,6 +48,9 @@ public class SetupScript : MonoBehaviour
         instance = this;
         DontDestroyOnLoad(this.gameObject);
         SceneManager.sceneLoaded += OnSceneLoaded;
+        noInternetMessage.SetActive(false);
+        StartCoroutine(CheckInternetConnection());
+        ResetInteractionTimer();
         
         // Connect Socket
         socket = new SocketIOUnity("http://localhost:3001/");
@@ -84,6 +93,7 @@ public class SetupScript : MonoBehaviour
 
         WebCamDevice[] camDevices = WebCamTexture.devices;
         string cam = camDevices.Length > 1 ? camDevices[1].name : camDevices[0].name;
+        // string cam = camDevices[0].name;
         webCamTexture = new WebCamTexture(cam, 1920, 1080, 30);
         webCamImage.texture = webCamTexture;
 
@@ -93,7 +103,9 @@ public class SetupScript : MonoBehaviour
 
     void Update()
     {
-        // เมื่อไม่พบใบหน้า รีเซ็ตข้อมูลและไปยังซีนที่เกี่ยวข้อง
+        CheckForInteraction();
+        CheckInactivityTimeout();
+
         if(check && !string.IsNullOrEmpty(nfdText)){
             SceneManager.LoadScene("noFaceScene", LoadSceneMode.Single);
             check = false;
@@ -127,7 +139,8 @@ public class SetupScript : MonoBehaviour
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         isQRSceneActive = scene.name == "qrCodeScene";
-        Debug.Log($"Scene loaded: {scene.name}, isQRSceneActive: {isQRSceneActive}");
+        isStartScene = scene.name == "startScene";
+        Debug.Log($"Scene loaded: {scene.name}, isQRSceneActive: {isQRSceneActive}, isStartScene: {isStartScene}");
     }
 
     public void ResetSocketData()
@@ -193,6 +206,69 @@ public class SetupScript : MonoBehaviour
         {
             Debug.LogError("🚨 Error sending data: " + ex.Message);
         }
+    }
+
+    IEnumerator CheckInternetConnection()
+    {
+        while (true)
+        {
+            // Check if we can reach Google's DNS server
+            bool isConnected = false;
+            
+            using (UnityWebRequest webRequest = UnityWebRequest.Get("https://8.8.8.8"))
+            {
+                // Send the request and wait for response
+                yield return webRequest.SendWebRequest();
+
+                if (webRequest.result == UnityWebRequest.Result.Success)
+                {
+                    isConnected = true;
+                }
+                else
+                {
+                    isConnected = false;
+                }
+            }
+
+            // Update UI based on connection status
+            noInternetMessage.SetActive(!isConnected);
+
+            // Wait before next check
+            yield return new WaitForSeconds(checkInterval);
+        }
+    }
+
+     private void CheckForInteraction()
+    {
+        if (isStartScene) return;
+
+        if (Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1) || Input.GetMouseButtonDown(2))
+        {
+            ResetInteractionTimer();
+        }
+    }
+
+    private void ResetInteractionTimer()
+    {
+        lastInteractionTime = Time.time;
+    }
+
+    private void CheckInactivityTimeout()
+    {
+        if (isStartScene) return;
+
+        if (Time.time - lastInteractionTime >= inactivityTimeout)
+        {
+            Debug.Log("No interaction detected for 5 minutes. Returning to start scene...");
+            ReturnToStartScene();
+        }
+    }
+
+    private void ReturnToStartScene()
+    {
+        ResetSocketData();
+        ResetInteractionTimer();
+        SceneManager.LoadScene("startScene", LoadSceneMode.Single);
     }
 
     public string FixJsonStructure(string jsonString)

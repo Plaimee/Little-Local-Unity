@@ -11,6 +11,7 @@ public class Display2Script : MonoBehaviour
 {
     private static Display2Script instance;
     public Camera display2;
+    public GameObject dp2Parent;
     public GameObject photo1;
     public GameObject photo2;
     public RawImage output;
@@ -21,6 +22,9 @@ public class Display2Script : MonoBehaviour
     public Animator outputAnimator;
     public bool check = true;
 
+    // เพิ่ม reference สำหรับ CanvasGroup
+    private CanvasGroup canvasGroup;
+
     void Start()
     {
         instance = this;
@@ -30,6 +34,13 @@ public class Display2Script : MonoBehaviour
             Display.displays[1].Activate();
         }
         output.gameObject.SetActive(false);
+
+        // ดึง หรือเพิ่ม CanvasGroup component
+        canvasGroup = dp2Parent.GetComponent<CanvasGroup>();
+        if (canvasGroup == null)
+        {
+            canvasGroup = dp2Parent.AddComponent<CanvasGroup>();
+        }
     }
 
     void Update()
@@ -41,7 +52,13 @@ public class Display2Script : MonoBehaviour
                 output.gameObject.SetActive(false);
                 StartCoroutine(RepeatedMoveAnimation());
             }
-        } 
+        }
+
+        if (SetupScript.instance != null && 
+            Time.time - SetupScript.instance.lastInteractionTime >= SetupScript.instance.inactivityTimeout)
+        {
+            ResetAllAnimations();
+        }
     }
 
     private bool AllImagesExist()
@@ -97,32 +114,67 @@ public class Display2Script : MonoBehaviour
         photo1Animator.SetTrigger("PlayPhoto1Animation");
         photo2Animator.SetTrigger("PlayPhoto2Animation");
         yield return new WaitForSeconds(3f);
+        ShowImage(output, outputPath);
         output.gameObject.SetActive(true);
         outputAnimator.SetTrigger("PlayOutputAnimation");
         yield return new WaitForSeconds(1.5f);
-        ShowImage(output, outputPath);
         StartCoroutine(FadeInEffect());
         check = true;
     }
 
     private IEnumerator FadeInEffect()
     {
-        output.gameObject.SetActive(true); // Ensure the output is visible
+        // เริ่มต้นด้วยการเปิด GameObject และตั้งค่า alpha เป็น 0
+        dp2Parent.SetActive(true);
+        canvasGroup.alpha = 0f;
 
-        Color color = output.color; // Get current color
         float elapsedTime = 0f;
-        float duration = 1f; // 1 second fade-in duration
+        float duration = 1f;
 
+        // ค่อยๆ เพิ่มค่า alpha
         while (elapsedTime < duration)
         {
-            color.a = Mathf.Lerp(0f, 1f, elapsedTime / duration); // Gradually increase alpha
-            output.color = color;
+            canvasGroup.alpha = Mathf.Lerp(0f, 1f, elapsedTime / duration);
             elapsedTime += Time.deltaTime;
             yield return null;
         }
 
-        color.a = 1f; // Ensure it's fully visible
-        output.color = color;
+        canvasGroup.alpha = 1f;
     }
 
+    private void ResetAllAnimations()
+    {
+        StopAllCoroutines();
+
+        if (photo1Animator != null)
+        {
+            photo1Animator.ResetTrigger("PlayPhoto1Animation");
+            photo1Animator.SetTrigger("ReturnToIdle");
+        }
+
+        if (photo2Animator != null)
+        {
+            photo2Animator.ResetTrigger("PlayPhoto2Animation");
+            photo2Animator.SetTrigger("ReturnToIdle");
+        }
+
+        if (outputAnimator != null)
+        {
+            outputAnimator.ResetTrigger("PlayOutputAnimation");
+            outputAnimator.SetTrigger("ReturnToIdle");
+        }
+
+        if (output != null)
+        {
+            output.gameObject.SetActive(false);
+        }
+
+        if (canvasGroup != null)
+        {
+            canvasGroup.alpha = 0f;
+        }
+
+        check = true;
+        oldOutputPath = null;
+    }
 }
