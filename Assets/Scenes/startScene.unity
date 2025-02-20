@@ -436,6 +436,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   targetObject: {fileID: 276634262}
+  isUIElement: 0
 --- !u!1 &294629667
 GameObject:
   m_ObjectHideFlags: 0
@@ -1295,6 +1296,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   targetObject: {fileID: 1234797527}
+  isUIElement: 0
 --- !u!1 &1259228041
 GameObject:
   m_ObjectHideFlags: 0
@@ -1393,6 +1395,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   targetObject: {fileID: 1275771208}
+  isUIElement: 0
 --- !u!114 &1275771211
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1887,9 +1890,9 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1234797528}
-  - {fileID: 1810782644}
-  - {fileID: 276634263}
   - {fileID: 1275771209}
+  - {fileID: 276634263}
+  - {fileID: 1810782644}
   m_Father: {fileID: 406724144}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -2030,6 +2033,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   targetObject: {fileID: 1810782643}
+  isUIElement: 0
 --- !u!1 &1946111984
 GameObject:
   m_ObjectHideFlags: 0
